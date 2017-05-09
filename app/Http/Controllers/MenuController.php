@@ -22,7 +22,7 @@ class MenuController extends Controller
      */
     public function index()
     {
-        $menus = Menu::all();
+        $menus = Menu::with('products')->get();
 
         return $menus;
     }
@@ -45,11 +45,13 @@ class MenuController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Http\Response|static[]
      */
     public function show($id)
     {
-        $menu = Menu::findOrFail($id);
+        $menu = Menu::with('products')->where('id', $id)->get();
+
+        if($menu->isEmpty()) abort(404);
 
         return $menu;
     }
