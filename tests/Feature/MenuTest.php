@@ -75,7 +75,7 @@ class MenuTest extends TestCase
         $response
             ->assertStatus(200);
 
-        $response = $this->json('DELETE', '/api/menu/100500');
+        $response = $this->json('DELETE', '/api/menu/1');
         $response
             ->assertStatus(404);
     }

@@ -34,7 +34,8 @@ class ProductController extends Controller
 
         if($menu) {
             try {
-                Product::create($input);
+                $newProduct = Product::create($input);
+                return redirect(action('ProductController@show', $newProduct->id));
             } catch (QueryException $e) {
                 if($e->errorInfo[1] == 1062) {
                     abort(409);
@@ -77,13 +78,7 @@ class ProductController extends Controller
         $product = Product::find($id);
 
         if($product) {
-            try {
-                $product->update($input);
-            } catch (QueryException $e) {
-                if($e->errorInfo[1] == 1062) {
-                    abort(409);
-                }
-            }
+            $product->update($input);
         } else {
             abort(404);
         }
