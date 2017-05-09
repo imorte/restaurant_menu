@@ -20,3 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::resource('menu', 'MenuController', ['except' =>
     ['create', 'edit']
 ]);
+
+Route::resource('product', 'ProductController', ['except' =>
+    ['create', 'edit']
+]);

@@ -2,28 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Menu;
+use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Http\Response|static[]
      */
     public function index()
     {
-        //
-    }
+        $products = Product::with('menu')->get();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return $products;
     }
 
     /**
@@ -34,29 +29,35 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $input = $request->all();
+        $menu = Menu::find($input['menu_id']);
+
+        if($menu) {
+            try {
+                Product::create($input);
+            } catch (QueryException $e) {
+                if($e->errorInfo[1] == 1062) {
+                    abort(409);
+                }
+            }
+        } else {
+            abort(400);
+        }
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Http\Response|static[]
      */
     public function show($id)
     {
-        //
-    }
+        $product = Product::with('menu')->where('id', $id)->get();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        if($product->isEmpty()) abort(404);
+
+        return $product;
     }
 
     /**
@@ -68,7 +69,24 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $input = $request->all();
+        $menuId = Menu::find($input['menu_id']);
+
+        if(!$menuId) abort(422);
+
+        $product = Product::find($id);
+
+        if($product) {
+            try {
+                $product->update($input);
+            } catch (QueryException $e) {
+                if($e->errorInfo[1] == 1062) {
+                    abort(409);
+                }
+            }
+        } else {
+            abort(404);
+        }
     }
 
     /**
@@ -79,6 +97,6 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if(!Product::destroy($id)) return abort(404);
     }
 }
